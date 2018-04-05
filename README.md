@@ -6,7 +6,13 @@ This is a starting point to demonstrate the method of authentication by verifyin
 
 ## Requirements
 
-- node and npm
+`node` and `npm` check versions with `node -v && npm -v`
+
+macOS users may need to install some [prerequisite packages](https://www.npmjs.com/package/node-gyp) such as the XCode Command Line Tools
+
+Windows users need to install some extra packages to build argon2:
+`npm install --global --production windows-build-tools`
+`npm install -g node-gyp`
 
 ## Usage
 
