@@ -17,6 +17,8 @@ const charsets   = require('password-sheriff').charsets;
 
 const argon2 = require('argon2'); // used to securely hash passwords
 
+const client = require('redis').createClient(); // used to track rate limits
+
 // =================================================================
 // configuration ===================================================
 // =================================================================
@@ -35,7 +37,9 @@ mongoose.connect(config.database, {
 app.set('superSecret', config.secret); // secret variable
 
 // use body parser so we can get info from POST and/or URL parameters
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({
+  extended: false
+}));
 app.use(bodyParser.json());
 
 // use morgan to log requests to the console
@@ -56,8 +60,9 @@ app.get('/setup', function(req, res) {
 	nick.save(function(err) {
 		if (err) throw err;
 
-		console.log('User saved successfully');
-		res.json({ success: true });
+		res.status(200).json({
+      success: true
+		});
 	});
 });
 
@@ -71,18 +76,35 @@ app.get('/', function(req, res) {
 // ---------------------------------------------------------
 const apiRoutes = express.Router();
 
+const limiter = require('express-limiter')(apiRoutes, client); // tell the rate limit plugin to handle apiRoutes route
+
+// setup a rate limit for auth endpoints
+let authLimit = limiter({
+  path: '/authenticate',                       // use this on all endpoints
+  total: 5,                                    // limit to 5 requests
+  method: 'all',                               // POST, GET, etc.
+  expire: 1000 * 60 * 5,                       // per 5 minutes
+  lookup: 'connection.remoteAddress',          // based on client ip address
+  onRateLimited: function (req, res, next) {
+    res.status(429).json({
+      success: false,
+      message: 'Rate limit exceeded'
+    })
+  }
+});
+
 // ---------------------------------------------------------
 // create user (no middleware necessary since this isn't authenticated)
 // ---------------------------------------------------------
 // http://localhost:8080/api/create
-apiRoutes.post('/create', function(req, res) {
+apiRoutes.post('/create', authLimit, function(req, res) {
 
   // check if username already exists, if so return error
   User.findOne({ username: req.body.username }, function(err, user) {
     if (err) throw err;
 
     if (user) {
-      res.json({
+      res.status(403).json({
         success: false,
         message: 'Username already exists.'
       });
@@ -106,7 +128,7 @@ apiRoutes.post('/create', function(req, res) {
       if (!policy.check(req.body.password)) {
 
         // if not return error and exit function with return
-        res.json({
+        res.status(406).json({
           success: false,
           message: 'Invalid Password',
           policy: policy.explain()
@@ -129,13 +151,13 @@ apiRoutes.post('/create', function(req, res) {
           if (err) throw err;
 
           // return success message
-          res.json({
+          res.status(200).json({
             success: true
           });
         });
 
       }).catch(err => { // something went wrong hashing the password
-        res.json({
+        res.status(500).json({
           success: false,
           message: 'Cannot Create Account',
           exception: err.message
@@ -149,14 +171,14 @@ apiRoutes.post('/create', function(req, res) {
 // authentication (no middleware necessary since this isn't authenticated)
 // ---------------------------------------------------------
 // http://localhost:8080/api/authenticate
-apiRoutes.post('/authenticate', function(req, res) {
+apiRoutes.post('/authenticate', authLimit, function(req, res) {
 
 	// find the user
 	User.findOne({ username: req.body.username }, function(err, user) {
 		if (err) throw err;
 
 		if (!user) {
-			res.json({
+			res.status(403).json({
         success: false,
         message: 'Authentication failed. User not found.'
 			});
@@ -164,7 +186,7 @@ apiRoutes.post('/authenticate', function(req, res) {
 		} else if (user) {
       argon2.verify(user.password, req.body.password).then(match => {
         if (!match) {
-          res.json({
+          res.status(403).json({
             success: false,
             message: 'Authentication failed. Wrong password.'
           });
@@ -181,7 +203,7 @@ apiRoutes.post('/authenticate', function(req, res) {
             expiresIn: 86400 // expires in 24 hours
           });
 
-          res.json({
+          res.status(200).json({
             success: true,
             message: 'Enjoy your token!',
             token: token
@@ -212,7 +234,7 @@ apiRoutes.use(function(req, res, next) {
 		// verifies secret and checks exp
 		jwt.verify(token, app.get('superSecret'), function(err, decoded) {			
 			if (err) {
-				return res.json({
+				return res.status(403).json({
           success: false,
           message: 'Failed to authenticate token.'
 				});
@@ -239,19 +261,27 @@ apiRoutes.use(function(req, res, next) {
 // authenticated routes
 // ---------------------------------------------------------
 apiRoutes.get('/', function(req, res) {
-	res.json({
+	res.status(200).json({
     message: 'Welcome to the coolest API on earth!'
 	});
 });
 
+// ---------------------------------------------------------
+// example authenticated route
+// ---------------------------------------------------------
 apiRoutes.get('/users', function(req, res) {
 	User.find({}, function(err, users) {
-		res.json(users);
+	  let retUsers = [];              // create array of usernames so we don't expose passwords
+	  users.forEach(function(user) {  // loop through users in database
+      retUsers.push(user.username); // add each username to array for returning
+    });
+
+		res.status(200).json(retUsers); // return the new array
 	});
 });
 
 apiRoutes.get('/check', function(req, res) {
-	res.json(req.decoded);
+	res.status(200).json(req.decoded);
 });
 
 app.use('/api', apiRoutes);

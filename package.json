@@ -5,9 +5,11 @@
     "argon2": "^0.17.3",
     "body-parser": "^1.15.0",
     "express": "^4.13.4",
+    "express-limiter": "^1.6.1",
     "jsonwebtoken": "^5.7.0",
     "mongoose": "^4.4.5",
     "morgan": "^1.7.0",
-    "password-sheriff": "^1.1.0"
+    "password-sheriff": "^1.1.0",
+    "redis": "^2.8.0"
   }
 }

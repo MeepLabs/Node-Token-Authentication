@@ -8,6 +8,8 @@ This is a starting point to demonstrate the method of authentication by verifyin
 
 `node` and `npm` check versions with `node -v && npm -v`
 
+[Redis](https://redis.io/topics/quickstart) needs to be installed on your local system for testing.
+
 macOS users may need to install some [prerequisite packages](https://www.npmjs.com/package/node-gyp) such as the XCode Command Line Tools
 
 Windows users need to install some extra packages to build argon2:
@@ -31,6 +33,7 @@ Once everything is set up, we can begin to use our app by creating and verifying
 ### Testing the API
 
 The easiest way to test any REST API is with [Postman](https://www.getpostman.com/) but you can also use `curl`
+This repository includes a [Postman collection](tests/node-token-authentication.postman_collection.json) that you can import into Postman for testing.
 
 ### Creating a User
 
