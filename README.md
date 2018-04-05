@@ -10,7 +10,7 @@ This is a starting point to demonstrate the method of authentication by verifyin
 
 ## Usage
 
-1. Clone the repo: `git clone git@github.com:scotch-io/node-token-authentication`
+1. Clone the repo: `git clone https://github.com/Cryptobyte/node-token-authentication.git`
 2. Install dependencies: `npm install`
 3. Change `secret` in `config.example.js` to something random
 4. Change `database` in `config.example.js` to your [connection string](https://docs.mongodb.com/manual/reference/connection-string/)
