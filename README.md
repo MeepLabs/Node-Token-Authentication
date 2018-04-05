@@ -12,23 +12,43 @@ This is a starting point to demonstrate the method of authentication by verifyin
 
 1. Clone the repo: `git clone git@github.com:scotch-io/node-token-authentication`
 2. Install dependencies: `npm install`
-3. Change SECRET in `config.js`
-4. Add your own MongoDB database to `config.js`
-5. Start the server: `node server.js`
-6. Create sample user by visiting: `http://localhost:8080/setup`
+3. Change `secret` in `config.example.js` to something random
+4. Change `database` in `config.example.js` to your [connection string](https://docs.mongodb.com/manual/reference/connection-string/)
+5. Rename `config.example.js` to `config.js`
+6. Start the server: `npm start`
+7. Your API will be available at: `http://localhost:8080/api`
 
 Once everything is set up, we can begin to use our app by creating and verifying tokens.
+
+### Testing the API
+
+The easiest way to test any REST API is with [Postman](https://www.getpostman.com/) but you can also use `curl`
+
+### Creating a User
+
+Send a `POST` request to `http://localhost:8080/api/authenticate` with test user parameters as `x-www-form-urlencoded`. 
+
+```
+{
+  username: 'username-here',
+  password: 'password-here'
+}
+```
+
+Curl example: `curl -d '{"username":"username-here", "password":"password-here"}' -H "Content-Type: application/x-www-form-urlencoded" -X POST http://localhost:8080/api/create`
 
 ### Getting a Token
 
 Send a `POST` request to `http://localhost:8080/api/authenticate` with test user parameters as `x-www-form-urlencoded`. 
 
 ```
-  {
-    name: 'Nick Cerminara',
-    password: 'password'
-  }
+{
+  username: 'username-here',
+  password: 'password-here'
+}
 ```
+
+Curl example: `curl -d '{"username":"username-here", "password":"password-here"}' -H "Content-Type: application/x-www-form-urlencoded" -X POST http://localhost:8080/api/authenticate`
 
 ### Verifying a Token and Listing Users
 
