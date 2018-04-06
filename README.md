@@ -4,6 +4,17 @@ This repo uses JSON Web Tokens and the [jsonwebtoken](https://github.com/auth0/n
 
 This is a starting point to demonstrate the method of authentication by verifying a token using Express route middleware.
 
+This fork of the Scotch.io repo is intended to modernize and secure the base starter repository that Scotch.io provided. 
+Several security enhancements are planned to be added in accordance with the [OSWAP Password Storage Cheat Sheet](https://www.owasp.org/index.php/Password_Storage_Cheat_Sheet)
+so that this repository can be used as a more secure and modern starting point for developing REST APIs
+
+## Planned Features
+- [x] Secure hashing method (argon2)
+- [x] Rate limit authentication endpoints
+- [ ] Automatic HTTPS in production environment
+- [ ] Email support for email verification and password reset mechanism
+- [ ] Support for 2FA with email reset backup
+
 ## Requirements
 
 `node` and `npm` check versions with `node -v && npm -v`
