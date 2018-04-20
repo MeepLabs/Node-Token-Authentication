@@ -27,5 +27,5 @@ node_modules
 # Users Environment Variables
 .lock-wscript
 
-idea/
+.idea/
 config.js

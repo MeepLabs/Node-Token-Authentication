@@ -35,6 +35,16 @@ router.post('/create', authLimit, function(req, res) {
   User.findOne({ username: req.body.username }, function(err, user) {
     if (err) throw err;
 
+    // check for required information
+    if ((!req.body.username) || (req.body.password) || (req.body.email)) {
+      res.status(403).json({
+        success: false,
+        message: 'Missing required information'
+      });
+
+      return;
+    }
+
     if (user) {
       res.status(403).json({
         success: false,
@@ -45,8 +55,8 @@ router.post('/create', authLimit, function(req, res) {
 
       // define password policy
       const policy = new passPolicy({
-        length: {minLength: 6},
-        identicalChars: {max: 3},
+        length: { minLength: 6 },
+        identicalChars: { max: 3 },
         contains: {
           expressions: [
             charsets.upperCase,
@@ -74,6 +84,7 @@ router.post('/create', authLimit, function(req, res) {
 
         // create new user object with hashed password
         const newUser = new User({
+          email: req.body.email,
           username: req.body.username,
           password: hash
         });
@@ -150,6 +161,14 @@ router.post('/authenticate', authLimit, function(req, res) {
       });
     }
   });
+});
+
+router.post('resetEmail', authLimit, function(req, res) {
+
+});
+
+router.post('reset2fa', authLimit, function (req, res) {
+
 });
 
 // ---------------------------------------------------------
