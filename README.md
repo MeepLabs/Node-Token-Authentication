@@ -7,6 +7,8 @@ This is a starting point to demonstrate the method of authentication by verifyin
 Several security features are included or planned to be added in accordance with the [OWASP Password Storage Cheat Sheet](https://www.owasp.org/index.php/Password_Storage_Cheat_Sheet)
 so that this repository can be used as a secure and modern starting point for developing REST APIs
 
+Any web application is insecure without a [fairly secure server](https://github.com/MeepLabs/Node-Token-Authentication/wiki/Secure-Server-Setup) running it.
+
 ## Planned Features
 - [x] Secure hashing method (argon2)
 - [x] Rate limit authentication endpoints
